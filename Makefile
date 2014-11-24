@@ -9,7 +9,7 @@ PROJ_PLT=$(CURDIR)/.depsolver_plt
 compile:
 	rebar compile
 run:
-	erl +K true +A30 -sname openweather_resolver -pa ebin deps/*/ebin -eval '[application:start(A) || A <- [kernel, syntax_tools, compiler, goldrush,  lager, asn1, crypto, jsx, public_key, ssl, inets, ranch, cowlib, cowboy, ibrowse, sync, openweather_resolver] ]'
+	erl +K true +A30 -sname openweather_resolver -pa ebin deps/*/ebin -eval '[application:start(A) || A <- [kernel, syntax_tools, compiler, goldrush,  lager, asn1, crypto, jsx, public_key, ssl, inets, ranch, cowlib, cowboy, sync, openweather_resolver] ]'
 
 $(PROJ_PLT):
 	dialyzer --output_plt $(PROJ_PLT) --build_plt \
