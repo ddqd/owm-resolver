@@ -8,9 +8,11 @@
  
 -export([handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--export([load/0]).
+-export([load/0, readlines/1]).
 
 -define(CITIES_URL, "http://openweathermap.org/help/city_list.txt").
+
+-record(cities, {id, name, lat, lon, countryCode}).
 
 load() ->
 	R = httpc:request(get, {?CITIES_URL, []}, [], []),
@@ -20,6 +22,37 @@ load() ->
 		_ ->
 			{error, "Unable to load"}
 	end.
+
+readlines(FileName) ->
+    {ok, Device} = file:open(FileName, [read]),
+    try get_all_lines(Device)
+      after file:close(Device)
+    end.
+
+get_all_lines(Device) ->
+    case io:get_line(Device, "") of
+        eof  -> [];
+        Line ->
+            [H|_T] = parse_cities_lines(Line),
+            Tokens = parse_city_line(H),
+            [parse_city(Tokens) | get_all_lines(Device)]
+    end.
+
+parse_city_line(CityString) ->
+    string:tokens(CityString, "\t").
+
+parse_cities_lines(Line) ->
+    string:tokens(Line, "\n").
+
+parse_city([Id, Name, Lat, Lon, Code]) ->
+    case string:to_integer(Id) of 
+        {Id2, []} ->
+            {Lat2, []} = string:to_float(Lat),
+            {Lon2, []} = string:to_float(Lon),
+            {Id2, Name, Lat2, Lon2, Code};
+        _ ->
+            error
+        end.
 
 init([]) ->
 	lager:log(info, self(), "resolver started"),
