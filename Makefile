@@ -1,29 +1,15 @@
-ERL = $(shell which erl)
-
-ERLFLAGS= -pa $(CURDIR)/.eunit -pa $(CURDIR)/ebin -pa $(CURDIR)/*/ebin
-
-PROJ_PLT=$(CURDIR)/.depsolver_plt
-
-.PHONY: dialyzer typer clean distclean
+.PHONY: clean 
 
 compile:
 	rebar compile
+
 run:
-	erl +K true +A30 -sname openweather_resolver -pa ebin deps/*/ebin -eval '[application:start(A) || A <- [kernel, syntax_tools, compiler, goldrush,  lager, asn1, crypto, jsx, public_key, ssl, inets, ranch, cowlib, cowboy, sync, openweather_resolver] ]'
+	(mkdir -p tmp)
+	erl +K true +A30 -sname openweather_resolver -pa ebin deps/*/ebin -config config/openweather_resolver.config -eval '[application:start(A) || A <- [kernel, syntax_tools, compiler, goldrush,  lager, asn1, crypto, jsx, public_key, ssl, inets, ranch, cowlib, cowboy, sync, mnesia, openweather_resolver] ]'
 
-$(PROJ_PLT):
-	dialyzer --output_plt $(PROJ_PLT) --build_plt \
-		--apps erts kernel stdlib crypto public_key -r deps --fullpath
-
-dialyzer: $(PROJ_PLT)
-	dialyzer --plt $(PROJ_PLT) -pa deps/* --src src
-
-typer: $(PROJ_PLT)
-	typer --plt $(PROJ_PLT) -r ./src
+test: clean
+	rebar eunit skip_deps=true
 
 clean:
-	$(REBAR) clean
-
-distclean: clean
-	rm $(PROJ_PLT)
-	rm -rvf $(CURDIR)/deps/*
+	(rm -rf tmp)
+	rebar clean

@@ -1,0 +1,1 @@
+-record(cities, {id, name, lat, lon, code}).

@@ -47,5 +47,5 @@ parse_cities(_) ->
                      {524901,"Moscow",55.75222,37.615555,"RU"},
                      {1271881,"Firozpur Jhirka",27.799999,76.949997,"IN"},
                      {1283240,"Kathmandu",27.716667,85.316666,"NP"}],
-    Result = openweather_resolver_srv:readlines("test/cities_example.txt"),
+    Result = openweather_resolver_srv:readlines("../test/cities_example.txt"),
     [?_assertEqual(ParsedCitiesList, Result)].

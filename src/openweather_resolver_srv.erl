@@ -2,6 +2,8 @@
  
 -behaviour(gen_server).
  
+-include("openweather_resolver.hrl").
+
 -export([start_link/0, stop/0]).
  
 -export([init/1]).
@@ -11,8 +13,6 @@
 -export([load/0, readlines/1]).
 
 -define(CITIES_URL, "http://openweathermap.org/help/city_list.txt").
-
--record(cities, {id, name, lat, lon, countryCode}).
 
 load() ->
 	R = httpc:request(get, {?CITIES_URL, []}, [], []),
@@ -56,7 +56,10 @@ parse_city([Id, Name, Lat, Lon, Code]) ->
 
 init([]) ->
 	lager:log(info, self(), "resolver started"),
-    {ok, state}.
+    {ok, []}.
+
+handle_call(stop, _From, State) ->
+    {stop, normal, ok, State};
 
 handle_call(_Request, _From, State) ->
     Reply = ok,
@@ -70,7 +73,7 @@ handle_info(_Info, State) ->
  
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
- 
+
 stop() ->
     gen_server:call(?MODULE, stop).
  
