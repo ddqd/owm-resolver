@@ -1,0 +1,38 @@
+-module(owm_resolver_app).
+
+-behaviour(application).
+
+%% Application callbacks
+-export([start/2, stop/1]).
+
+%% ===================================================================
+%% Application callbacks
+%% ===================================================================
+
+dispatch_rules() ->
+    _Static = fun(Filetype) ->
+        {lists:append(["/", Filetype, "/[...]"]), cowboy_static, 
+            {dir, "priv/"++Filetype}}
+    end,
+    cowboy_router:compile([
+        {'_', [
+            % Static("img"),
+            {"/api/:param", owm_resolver_http_handler, []},
+        	{"/index.html", cowboy_static, {file, "priv/html/index.html"}},
+            {"/", cowboy_static, {file, "priv/html/index.html"}},
+            {'_', notfound_handler, []}
+        ]}
+    ]).
+
+start(_StartType, _StartArgs) ->
+	Config = {port, 8080},
+	{_, Port} = Config, 
+	Dispatch = dispatch_rules(),
+	{ok, _} = cowboy:start_http(http, 100, [Config], [
+		{env, [{dispatch, Dispatch}]}
+	]),
+	lager:log(info, self(), "owm resolver started on ~p:~p", [node(), Port]),
+	owm_resolver_sup:start_link().
+
+stop(_State) ->
+    ok.

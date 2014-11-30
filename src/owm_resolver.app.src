@@ -1,4 +1,4 @@
-{application, openweather_resolver,
+{application, owm_resolver,
  [
   {description, ""},
   {vsn, "1"},
@@ -7,6 +7,6 @@
                   kernel,
                   stdlib
                  ]},
-  {mod, { openweather_resolver_app, []}},
+  {mod, { owm_resolver_app, []}},
   {env, []}
  ]}.

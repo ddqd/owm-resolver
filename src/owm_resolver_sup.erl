@@ -1,4 +1,4 @@
--module(openweather_resolver_sup).
+-module(owm_resolver_sup).
 
 -behaviour(supervisor).
 
@@ -23,5 +23,5 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    {ok, { {one_for_one, 5, 10}, [?CHILD(openweather_resolver_srv, worker)]}}.
+    {ok, { {one_for_one, 5, 10}, [?CHILD(owm_resolver_srv, worker)]}}.
 
