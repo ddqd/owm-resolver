@@ -76,13 +76,12 @@ handle_call(_Request, _From, State) ->
     {reply, Reply, State}.
 
 handle_cast(load, State) ->
-    Result = owm_resolver_db:install(),
+    _Result = owm_resolver_db:install(),
     lager:log(info, self(), "Loading city_list", []),
    case load() of
         {ok, Body} ->
             CityLines = parse_cities_lines(Body),
             CityList = parse_city_line(CityLines),
-            lager:log(info, self(), "list is ~p", [CityList]),
             owm_resolver_db:set_data(CityList); 
         {error, _Message} ->
             error

@@ -1,11 +1,26 @@
 {application, owm_resolver,
  [
-  {description, ""},
-  {vsn, "1"},
+  {description, "OpenWeatherMap city code resolver"},
+  {vsn, "0.0.1  "},
   {registered, []},
+  {modules, [owm_resolver_app, owm_resolver_sup, owm_resolver_srv, owm_resolver_http_handler, notfound_handler, owm_resolver_db]},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+                  syntax_tools,
+                  compiler,
+                  goldrush,
+                  lager,
+                  asn1,
+                  crypto,
+                  jsx,
+                  public_key, 
+                  ssl,
+                  inets,
+                  ranch,
+                  cowlib,
+                  cowboy,
+                  mnesia
                  ]},
   {mod, { owm_resolver_app, []}},
   {env, []}

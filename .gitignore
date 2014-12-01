@@ -8,7 +8,8 @@ deps
 *.plt
 erl_crash.dump
 ebin
-rel/example_project
+rel/owm_resolver
+rel/files
 .concrete/DEV_MODE
 .rebar
 log

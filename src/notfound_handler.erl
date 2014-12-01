@@ -11,7 +11,7 @@ init({tcp, http}, Req, _Opts) ->
     {ok, Req, undefined_state}.
 
 handle(Req, State) ->
-    {URL, Req2} = cowboy_req:url(Req),
+    {_URL, Req2} = cowboy_req:url(Req),
     {ok, Req3} = cowboy_req:reply(404, [], "404", Req2),
     {ok, Req3, State}.
 
