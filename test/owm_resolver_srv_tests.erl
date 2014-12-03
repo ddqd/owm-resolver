@@ -1,4 +1,4 @@
--module(openweather_resolver_srv_tests).
+-module(owm_resolver_srv_tests).
 
 -compile(export_all).
 

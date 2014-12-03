@@ -1,10 +1,10 @@
--module(openweather_resolver_db_tests).
+-module(owm_resolver_db_tests).
 
 -compile(export_all).
 
 -include_lib("eunit/include/eunit.hrl").
 
--include("openweather_resolver.hrl").
+-include("owm_resolver.hrl").
 
 -define(setup(F), {setup, fun start/0, fun stop/1, F}).
 
