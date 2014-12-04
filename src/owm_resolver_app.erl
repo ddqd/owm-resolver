@@ -24,6 +24,15 @@ dispatch_rules() ->
         ]}
     ]).
 
+getArgs() ->
+    Res = application:get_env(owm_resolver, start_type),
+    case Res of 
+        {ok, production} ->
+            [{start_type, production}];
+        _ ->
+            [{start_type, testing}]
+    end.
+
 start(_StartType, _StartArgs) ->
 	Config = {port, 8080},
 	{_, Port} = Config, 
@@ -32,7 +41,7 @@ start(_StartType, _StartArgs) ->
 		{env, [{dispatch, Dispatch}]}
 	]),
 	lager:log(info, self(), "owm resolver started on ~p:~p", [node(), Port]),
-	owm_resolver_sup:start_link().
+	owm_resolver_sup:start_link(getArgs()).
 
 stop(_State) ->
     ok.

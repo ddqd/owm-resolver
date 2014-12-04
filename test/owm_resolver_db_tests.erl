@@ -13,11 +13,11 @@
 start() ->
     ok = application:start(mnesia),
     mnesia:clear_table(cities),
-    {ok, Pid} = openweather_resolver_srv:start_link(),
+    {ok, Pid} = owm_resolver_srv:start_link(),
     Pid.
 
 stop(_) ->
-    openweather_resolver_srv:stop(),
+    owm_resolver_srv:stop(),
     application:stop(mnesia).
 
 start_stop_test_() ->
@@ -26,7 +26,7 @@ start_stop_test_() ->
 
 is_registered(Pid) ->
     [?_assert(erlang:is_process_alive(Pid)),
-     ?_assertEqual(Pid, whereis(openweather_resolver_srv))].
+     ?_assertEqual(Pid, whereis(owm_resolver_srv))].
 
 db_tests_() ->
     [{"Test create mnesia table",
@@ -37,15 +37,15 @@ db_tests_() ->
      ?setup(fun search_city/0)}].
 
 install() ->
-    Result = openweather_resolver_db:install(),
+    Result = owm_resolver_db:install(),
     [?_assertEqual({ok, created}, Result)].
 
 write_record() ->
-    openweather_resolver_db:install(),
-    WriteResult = openweather_resolver_db:set_data(?TEST_CITY_RECORD),
+    owm_resolver_db:install(),
+    WriteResult = owm_resolver_db:set_data(?TEST_CITY_RECORD),
     [?_assertEqual({ok, created}, WriteResult)].
 
 search_city() ->
     write_record(),
-    Result = openweather_resolver_db:search("Ci"),
+    Result = owm_resolver_db:search("Ci"),
     [?_assertEqual({ok, ?TEST_CITY_RECORD}, Result)].     

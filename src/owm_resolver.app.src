@@ -1,7 +1,7 @@
 {application, owm_resolver,
  [
   {description, "OpenWeatherMap city code resolver"},
-  {vsn, "0.0.1  "},
+  {vsn, git},
   {registered, []},
   {modules, [owm_resolver_app, owm_resolver_sup, owm_resolver_srv, owm_resolver_http_handler, notfound_handler, owm_resolver_db]},
   {applications, [
@@ -23,5 +23,5 @@
                   mnesia
                  ]},
   {mod, { owm_resolver_app, []}},
-  {env, []}
+  {env, [{start_type, production}]}
  ]}.
