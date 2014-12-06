@@ -34,6 +34,7 @@ allowed(_Method, {_Identity, _Scope}) ->
 %===================================
 
 get(Query, _Options) ->
+    lager:log(info, self(), "Query ~p", [Query]), 
     case proplists:get_value(param, Query) of
         <<"search">> ->
             parse_search(Query);
@@ -64,17 +65,22 @@ parse_search(Query) ->
     Name = getValueFromQuery(<<"name">>, Query),
     CountryCode = getValueFromQuery(<<"countryCode">>, Query),
     Format = getFormatFromQuery(Query),
-    {ok, Result} = owm_resolver_db:search(Name, CountryCode),
-    JsonAnswer = city_list_to_json(Result, Format),
-    % lager:log(info, self(), "search result ~p", [JsonAnswer]),
-    {ok, [<<"ok">>, JsonAnswer]}.
+    case owm_resolver_db:search(Name, CountryCode) of
+        {ok, Result} ->
+            JsonAnswer = city_list_to_json(Result, Format),
+            lager:log(info, self(), "search result ~p", [JsonAnswer]),
+            {ok, [{result, JsonAnswer}]};
+        {error, _Message} ->
+            {ok, [{result, []}]}
+    end.
 
 getValueFromQuery(Key, Query) ->
     case proplists:get_value(Key, Query) of
         undefined ->
             [];
         Result ->
-            binary:bin_to_list(Result)
+            R = binary:bin_to_list(Result),
+            re:replace(R, "[^A-Za-z]", "", [global, {return, list}])
     end.
 
 getFormatFromQuery(Query) ->
@@ -82,17 +88,21 @@ getFormatFromQuery(Query) ->
     case FormatList of
         "short" ->
             fun (#cities{id = Id, name = Name, code = Code})  ->
-                    jsx:encode([{<<"id">>, erlang:integer_to_binary(Id)},
-                                {<<"name">>, erlang:list_to_binary(Name)},
-                                {<<"countryCode">>, erlang:list_to_binary(Code)}])
+                    [
+                        {<<"id">>, erlang:integer_to_binary(Id)},
+                        {<<"name">>, erlang:list_to_binary(Name)},
+                        {<<"countryCode">>, erlang:list_to_binary(Code)}
+                    ]
             end;
         _ ->
             fun (#cities{id = Id, name = Name, lat = Lat, lon = Lon, code = Code}) ->
-                    jsx:encode([{<<"id">>, erlang:integer_to_binary(Id)},
-                                {<<"name">>, erlang:list_to_binary(Name)},
-                                {<<"lat">>, erlang:float_to_binary(Lat, [{decimals, 6}])},
-                                {<<"lon">>, erlang:float_to_binary(Lon, [{decimals, 6}])},
-                                {<<"countryCode">>, erlang:list_to_binary(Code)}])
+                    [
+                        {<<"id">>, erlang:integer_to_binary(Id)},
+                        {<<"name">>, erlang:list_to_binary(Name)},
+                        {<<"lat">>, erlang:float_to_binary(Lat, [{decimals, 6}])},
+                        {<<"lon">>, erlang:float_to_binary(Lon, [{decimals, 6}])},
+                        {<<"countryCode">>, erlang:list_to_binary(Code)}
+                    ]
             end
     end.
 
@@ -110,9 +120,8 @@ get_countries() ->
     {ok, Result} = owm_resolver_db:get_countries(),
     case Result of
         [] ->
-           {ok, []};
+           {ok, [{result, []}]};
         R ->
             BinResult = lists:map(fun erlang:list_to_binary/1, R),
             {ok, [{result, BinResult}]}
     end.
-   

@@ -35,6 +35,9 @@ install() ->
             Error
     end.
 
+search([], []) ->
+    {error, "empty request"};
+
 search(ReqName, []) ->
     search(ReqName);
 
@@ -50,6 +53,9 @@ search(ReqName, CountryCode) ->
         end
     end,
     transaction(F).
+
+search([]) ->
+    {error, "empty request"};
 
 search(ReqName) ->
     F = fun() ->
