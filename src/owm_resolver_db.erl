@@ -1,6 +1,6 @@
 -module(owm_resolver_db).
  
--export([install/0, search/1, search/2, set_data/1, get_all/0, is_exist/0]).
+-export([install/0, search/1, search/2, set_data/1, get_all/0, is_exist/0, get_countries/0]).
 
 -include_lib("stdlib/include/qlc.hrl").
 
@@ -71,7 +71,10 @@ is_match(CityName, ReqName) ->
     end.
 
 sort_by_name(A, B) ->
-     A#cities.name =< B#cities.name.
+     sort_by_alphabetical(A#cities.name, B#cities.name).
+
+sort_by_alphabetical(A, B) ->
+    A =< B.
 
 set_data(CityList) when is_list(CityList) ->
     mnesia:ets(
@@ -95,3 +98,16 @@ transaction(F) ->
 is_exist() ->
     Tables = mnesia:system_info(tables),
     lists:member(cities, Tables).
+
+get_countries() ->
+     F = fun() ->
+        Query = qlc:q([ Code || #cities{code = Code} <- mnesia:table(cities)] ),
+        Res = qlc:eval(qlc:sort(Query, {order, fun sort_by_alphabetical/2})),
+        case Res of 
+            [] -> 
+                {error, not_found};
+            Result ->
+                {ok, Result}
+        end
+    end,
+    transaction(F).

@@ -34,6 +34,10 @@ compile: deps
 build: compile
 	rebar generate overlay_vars=$(OVERLAY_VARS)
 
+dirty_run:
+	(mkdir -p tmp)
+	erl +K true +A30 -sname owm_resolver -pa ebin deps/*/ebin -eval '[application:start(A) || A <- [kernel, syntax_tools, compiler, goldrush, asn1, crypto, jsx, public_key, ssl, inets, ranch, cowlib, cowboy, lager, sync, mnesia, owm_resolver] ]'
+
 run: clean
 	make OVERLAY_VARS=files/vars-dev.config
 	./rel/$(PROJECT)/bin/$(PROJECT) console
