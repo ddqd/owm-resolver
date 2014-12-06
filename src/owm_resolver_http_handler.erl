@@ -37,6 +37,8 @@ get(Query, _Options) ->
     case proplists:get_value(param, Query) of
         <<"search">> ->
             parse_search(Query);
+        <<"cc">> ->
+            get_countries();
         _ ->
             {ok, []}
     end.
@@ -103,4 +105,14 @@ city_list_to_json([], _FormatFun, Acc) ->
 city_list_to_json([H|T], FormatFun, Acc) ->
     Result = FormatFun(H),
     city_list_to_json(T, FormatFun, Acc++[Result]).
-  
+
+get_countries() ->
+    {ok, Result} = owm_resolver_db:get_countries(),
+    case Result of
+        [] ->
+           {ok, []};
+        R ->
+            BinResult = lists:map(fun erlang:list_to_binary/1, R),
+            {ok, [{result, BinResult}]}
+    end.
+   

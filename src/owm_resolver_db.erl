@@ -101,7 +101,7 @@ is_exist() ->
 
 get_countries() ->
      F = fun() ->
-        Query = qlc:q([ Code || #cities{code = Code} <- mnesia:table(cities)] ),
+        Query = qlc:q([ Code || #cities{code = Code} <- mnesia:table(cities)], {unique, true} ),
         Res = qlc:eval(qlc:sort(Query, {order, fun sort_by_alphabetical/2})),
         case Res of 
             [] -> 

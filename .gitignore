@@ -16,3 +16,4 @@ log
 tmp/
 build/
 mnesia
+Mnesia*
