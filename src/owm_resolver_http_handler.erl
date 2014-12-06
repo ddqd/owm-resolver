@@ -34,11 +34,10 @@ allowed(_Method, {_Identity, _Scope}) ->
 %===================================
 
 get(Query, _Options) ->
-    lager:log(info, self(), "Query ~p", [Query]), 
     case proplists:get_value(param, Query) of
         <<"search">> ->
             parse_search(Query);
-        <<"cc">> ->
+        <<"codes">> ->
             get_countries();
         _ ->
             {ok, []}
@@ -68,7 +67,6 @@ parse_search(Query) ->
     case owm_resolver_db:search(Name, CountryCode) of
         {ok, Result} ->
             JsonAnswer = city_list_to_json(Result, Format),
-            lager:log(info, self(), "search result ~p", [JsonAnswer]),
             {ok, [{result, JsonAnswer}]};
         {error, _Message} ->
             {ok, [{result, []}]}
