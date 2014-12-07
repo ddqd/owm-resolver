@@ -10,7 +10,7 @@
 	
 ###usage:
 ####search city by name
-```html
+```
 /api/search?name=samara
 ```
 #####result:
@@ -35,7 +35,7 @@
 }
 ```
 ####short format:
-```html
+```
 /api/search?name=Samara&format=short
 ```
 #####result:
@@ -65,7 +65,6 @@
     "result": [
         "AD",
         "AE",
-        ...
         "AG"
     ]
 }
