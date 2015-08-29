@@ -2,6 +2,16 @@
 # -*- tab-width:4;indent-tabs-mode:nil -*-
 # ex: ts=4 sw=4 et
 
+### BEGIN INIT INFO
+# Provides:          owm_resolver
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: OpenWeatherMap city id resolver
+# Description:       OpenWeatherMap city id resolver
+### END INIT INFO
+
 RUNNER_SCRIPT_DIR={{runner_script_dir}}
 
 CALLER_DIR=$PWD
