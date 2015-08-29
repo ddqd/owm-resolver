@@ -24,6 +24,9 @@ RUNNER_USER={{runner_user}}
 
 # Make sure this script is running as the appropriate user
 if [ ! -z "$RUNNER_USER" ] && [ `whoami` != "$RUNNER_USER" ]; then
+    #postinstall script in vivid not running
+    mkdir -p "/var/lib/$RUNNER_USER"
+    chown owm_resolver:owm_resolver "/var/lib/$RUNNER_USER"
     exec sudo -u $RUNNER_USER -i $0 $@
 fi
 

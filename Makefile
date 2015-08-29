@@ -58,11 +58,11 @@ deb: clean build
 	cp -R $(BUILD_DIR)/releases $(PACKAGE_DIR)/usr/lib/$(PROJECT)/
 
 	install -p -m 0755 $(BUILD_DIR)/bin/$(PROJECT)		$(PACKAGE_DIR)/usr/lib/$(PROJECT)/bin/$(PROJECT)
-	install -p -m 0755 $(BUILD_DIR)/bin/$(PROJECT)	$(PACKAGE_DIR)/etc/init.d/$(PROJECT)
+	install -p -m 0755 $(BUILD_DIR)/bin/$(PROJECT)		$(PACKAGE_DIR)/etc/init.d/$(PROJECT)
 	install -m644 $(BUILD_DIR)/etc/app.config      		$(PACKAGE_DIR)/etc/$(PROJECT)/app.config
 	install -m644 $(BUILD_DIR)/etc/vm.args         		$(PACKAGE_DIR)/etc/$(PROJECT)/vm.args
 
-	fpm -s dir -t deb -f -n $(PACKAGE) -v $(VERSION) \
+	fpm -s dir -t deb -f -n $(PACKAGE) --vendor dema -v $(VERSION) \
 		--after-install $(CURDIR)/rel/files/postinst \
 		--after-remove  $(CURDIR)/rel/files/postrm \
 		--config-files /etc/$(PROJECT)/app.config \
