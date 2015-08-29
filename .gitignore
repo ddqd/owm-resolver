@@ -8,8 +8,7 @@ deps
 *.plt
 erl_crash.dump
 ebin
-rel/owm_resolver
-owm_resolver
+rel/owm_resolver/*
 .concrete/DEV_MODE
 .rebar
 log
@@ -17,4 +16,4 @@ tmp/
 build/
 mnesia
 Mnesia*
-.deb
+*.deb

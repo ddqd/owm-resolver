@@ -52,10 +52,10 @@ deb: clean build
 	cp -R $(BUILD_DIR)/lib      $(PACKAGE_DIR)/usr/lib/$(PROJECT)/
 	cp -R $(BUILD_DIR)/releases $(PACKAGE_DIR)/usr/lib/$(PROJECT)/
 
-	install -p -m 0755 $(BUILD_DIR)/bin/$(PROJECT) $(PACKAGE_DIR)/usr/lib/$(PROJECT)/bin/$(PROJECT)
-	install -p -m 0755 $(CURDIR)/rel/files/init     $(PACKAGE_DIR)/etc/init.d/$(PROJECT)
-	install -m644 $(BUILD_DIR)/etc/app.config      $(PACKAGE_DIR)/etc/$(PROJECT)/app.config
-	install -m644 $(BUILD_DIR)/etc/vm.args         $(PACKAGE_DIR)/etc/$(PROJECT)/vm.args
+	install -p -m 0755 $(BUILD_DIR)/bin/$(PROJECT)		$(PACKAGE_DIR)/usr/lib/$(PROJECT)/bin/$(PROJECT)
+	install -p -m 0755 $(CURDIR)/rel/files/$(PROJECT)	$(PACKAGE_DIR)/etc/init.d/$(PROJECT)
+	install -m644 $(BUILD_DIR)/etc/app.config      		$(PACKAGE_DIR)/etc/$(PROJECT)/app.config
+	install -m644 $(BUILD_DIR)/etc/vm.args         		$(PACKAGE_DIR)/etc/$(PROJECT)/vm.args
 
 	fpm -s dir -t deb -f -n $(PACKAGE) -v $(VERSION) \
 		--after-install $(CURDIR)/rel/files/postinst \
