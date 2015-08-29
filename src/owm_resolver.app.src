@@ -22,6 +22,5 @@
                   cowboy,
                   mnesia
                  ]},
-  {mod, { owm_resolver_app, []}},
-  {env, [{start_type, production}, {port, 1488}]}
+  {mod, { owm_resolver_app, []}}
  ]}.

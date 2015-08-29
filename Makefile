@@ -5,15 +5,19 @@ HOMEPAGE="https://github.com/ddqd/owm_resolver"
 BUILD_DIR=$(CURDIR)/rel/$(PROJECT)
 PACKAGE_DIR=$(CURDIR)/build
 
-_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
-ifeq ($(_BRANCH),master)
+BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+ifeq ($(BRANCH),master)
 	PACKAGE?=$(PROJECT)
 else
-	PACKAGE?=$(PROJECT)-$(_BRANCH)
+	PACKAGE?=$(PROJECT)-$(BRANCH)
 endif
 
-OVERLAY_VARS?=files/vars.config
-VERSION?=$(shell git describe --always --tags | sed -e "s/-[^-]*$$//;s/-/./")
+RELEASE_EXECUTABLE = rel/$(PROJECT)/bin/$(PROJECT)
+
+OVERLAY_VARS_PRODUCTION?=files/vars.config
+OVERLAY_VARS_DEBUG?=files/vars-dev.config
+COMMIT_COUNT=$(shell git log --oneline | wc -l)
+VERSION?=$(COMMIT_COUNT)-$(shell git describe --always --tags | sed -e "s/-[^-]*$$//;s/-/./")
 
 all: build
 
@@ -32,15 +36,15 @@ compile: deps
 	rebar xref skip_apps=goldrush
 
 build: compile
-	rebar generate overlay_vars=$(OVERLAY_VARS)
+	rebar generate overlay_vars=$(OVERLAY_VARS_PRODUCTION)
 
-dirty_run:
-	(mkdir -p tmp)
-	erl +K true +A30 -sname owm_resolver -pa ebin deps/*/ebin -eval '[application:start(A) || A <- [kernel, syntax_tools, compiler, goldrush, asn1, crypto, jsx, public_key, ssl, inets, ranch, cowlib, cowboy, lager, sync, mnesia, owm_resolver] ]'
+build_testing: clean compile 
+	rebar generate overlay_vars=$(OVERLAY_VARS_DEBUG)
+	chmod +x $(RELEASE_EXECUTABLE)
 
-run: clean
-	make OVERLAY_VARS=files/vars-dev.config
-	./rel/$(PROJECT)/bin/$(PROJECT) console
+
+testing_console: build_testing
+	./$(RELEASE_EXECUTABLE) console
 
 deb: clean build
 	mkdir -p $(PACKAGE_DIR)/etc/init.d
@@ -53,7 +57,7 @@ deb: clean build
 	cp -R $(BUILD_DIR)/releases $(PACKAGE_DIR)/usr/lib/$(PROJECT)/
 
 	install -p -m 0755 $(BUILD_DIR)/bin/$(PROJECT)		$(PACKAGE_DIR)/usr/lib/$(PROJECT)/bin/$(PROJECT)
-	install -p -m 0755 $(CURDIR)/rel/files/$(PROJECT)	$(PACKAGE_DIR)/etc/init.d/$(PROJECT)
+	install -p -m 0755 $(BUILD_DIR)/bin/$(PROJECT)	$(PACKAGE_DIR)/etc/init.d/$(PROJECT)
 	install -m644 $(BUILD_DIR)/etc/app.config      		$(PACKAGE_DIR)/etc/$(PROJECT)/app.config
 	install -m644 $(BUILD_DIR)/etc/vm.args         		$(PACKAGE_DIR)/etc/$(PROJECT)/vm.args
 

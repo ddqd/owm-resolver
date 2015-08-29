@@ -21,13 +21,16 @@ dispatch_rules() ->
     ]).
 
 getArgs() ->
-    Res = application:get_env(owm_resolver, start_type),
-    case Res of 
+    _Host = application:get_env(owm_resolver, host),
+    {ok, Host} = _Host,
+    _Res = application:get_env(owm_resolver, start_type),
+    Res = case _Res of 
         {ok, production} ->
-            [{start_type, production}];
+            [{host, Host}, {start_type, production}];
         _ ->
-            [{start_type, testing}]
-    end.
+            [{host, Host}, {start_type, testing}]
+    end,
+    [{args, Res}].
     
 start(_StartType, _StartArgs) ->
     {ok, _Port} = application:get_env(owm_resolver, port),

@@ -4,20 +4,18 @@
  
 -include("owm_resolver.hrl").
 
--export([start_link/1, stop/0]).
+-export([start_link/1, start_link/2, start_link/3, stop/0]).
  
 -export([init/1]).
  
 -export([handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--export([load/0, parse_city_list/1]).
+-export([load/1, parse_city_list/1]).
 
--define(CITIES_URL, "http://openweathermap.org/help/city_list.txt").
+-record(state, {host=[]}).
 
--record(state, {param}).
-
-load() ->
-	R = httpc:request(get, {?CITIES_URL, []}, [], []),
+load(Host) ->
+	R = httpc:request(get, {Host, []}, [], []),
 	case R of
 		{ok, {{_HTTP_VERSION, _ReturnCode, _State}, _Head, Body}} ->
 			{ok, Body};
@@ -63,22 +61,22 @@ parse_city(Other) ->
     lager:log(info, self(), "error parse city ~p", [Other]),
     error.
 
-init(Args) ->
+init(Args_) ->
+    {args, Args} = Args_,
 	lager:log(info, self(), "resolver started with mode ~p", [Args]),
-    Type = proplists:get_value(start_type, [Args]),
-    case Type of
-        production ->
-            check_load();
-        _ ->
-            ok
-    end,
-    {ok, #state{}}.
+    Host =  proplists:get_value(host, Args),
+    Type = proplists:get_value(start_type, Args),
+    lager:log(info, self(), "start update ~p", [Type]),
+    check_load(),
+    {ok, #state{host=Host}}.
 
 check_load() ->
     case owm_resolver_db:is_exist() of
         false ->
+            lager:log(info, self(), "start update", []),
             gen_server:cast(?MODULE, load);
         _ ->
+            lager:log(info, self(), "db is updated", []),
             ok
     end.
 
@@ -92,7 +90,7 @@ handle_call(_Request, _From, State) ->
 handle_cast(load, State) ->
     _Result = owm_resolver_db:install(),
     lager:log(info, self(), "Loading city_list", []),
-   case load() of
+   case load(State#state.host) of
         {ok, Body} ->
             CityList = parse_city_list(Body),
             owm_resolver_db:set_data(CityList); 
@@ -110,6 +108,12 @@ handle_info(_Info, State) ->
  
 start_link(Args) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Args, []).
+
+start_link(Args, _) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, Args, []).
+
+start_link(Args, State, _) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, Args, State).
 
 stop() ->
     gen_server:call(?MODULE, stop).
