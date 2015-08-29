@@ -16,8 +16,7 @@ RELEASE_EXECUTABLE = rel/$(PROJECT)/bin/$(PROJECT)
 
 OVERLAY_VARS_PRODUCTION?=files/vars.config
 OVERLAY_VARS_DEBUG?=files/vars-dev.config
-COMMIT_COUNT=$(shell git log --oneline | wc -l)
-VERSION?=$(COMMIT_COUNT)-$(shell git describe --always --tags | sed -e "s/-[^-]*$$//;s/-/./")
+VERSION?=$(shell git describe --always --tags | sed -e "s/-[^-]*$$//;s/-/./")
 
 all: build
 
