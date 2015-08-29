@@ -10,15 +10,8 @@
 %% ===================================================================
 
 dispatch_rules() ->
-    BindTo = application:get_env(owm_resolver, bind_to),
-    Host = case BindTo of
-        undefined ->
-            '_';
-        {ok, Host_} ->
-            Host_
-    end,
     cowboy_router:compile([
-        {Host, [
+        {'_', [
             % Static("img"),
             {"/api/:param", owm_resolver_http_handler, []},
         	{"/index.html", cowboy_static, {file, "priv/html/index.html"}},
