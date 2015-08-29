@@ -10,10 +10,6 @@
 %% ===================================================================
 
 dispatch_rules() ->
-    _Static = fun(Filetype) ->
-        {lists:append(["/", Filetype, "/[...]"]), cowboy_static, 
-            {dir, "priv/"++Filetype}}
-    end,
     cowboy_router:compile([
         {'_', [
             % Static("img"),
