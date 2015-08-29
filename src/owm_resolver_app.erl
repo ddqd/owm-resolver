@@ -28,9 +28,10 @@ getArgs() ->
         _ ->
             [{start_type, testing}]
     end.
-
+    
 start(_StartType, _StartArgs) ->
-	Config = {port, 8080},
+    {ok, _Port} = application:get_env(owm_resolver, port),
+	Config = {port, _Port},
 	{_, Port} = Config, 
 	Dispatch = dispatch_rules(),
 	{ok, _} = cowboy:start_http(http, 100, [Config], [

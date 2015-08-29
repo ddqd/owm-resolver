@@ -1,6 +1,19 @@
 ####[OpenWeatherMap][1] city id search service
 =====================
 
+####dependencies:
+```
+erlang-otp
+rebar
+ruby, ruby-dev
+gem fpm
+```
+
+####default config
+```
+port=1488
+```
+
 ####generate release
 	make all
 ####launch release

@@ -23,5 +23,5 @@
                   mnesia
                  ]},
   {mod, { owm_resolver_app, []}},
-  {env, [{start_type, production}]}
+  {env, [{start_type, production}, {port, 1488}]}
  ]}.
