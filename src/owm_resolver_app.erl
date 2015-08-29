@@ -10,8 +10,15 @@
 %% ===================================================================
 
 dispatch_rules() ->
+    BindTo = application:get_env(owm_resolver, bind_to),
+    Host = case BindTo of
+        undefined ->
+            '_';
+        {ok, Host_} ->
+            Host_
+    end,
     cowboy_router:compile([
-        {'_', [
+        {Host, [
             % Static("img"),
             {"/api/:param", owm_resolver_http_handler, []},
         	{"/index.html", cowboy_static, {file, "priv/html/index.html"}},
@@ -26,18 +33,17 @@ getArgs() ->
     _Res = application:get_env(owm_resolver, start_type),
     Res = case _Res of 
         {ok, production} ->
-            [{host, Host}, {start_type, production}];
+            {start_type, production};
         _ ->
-            [{host, Host}, {start_type, testing}]
+            {start_type, testing}
     end,
-    [{args, Res}].
+    [{host, Host}, Res].
     
 start(_StartType, _StartArgs) ->
-    {ok, _Port} = application:get_env(owm_resolver, port),
-	Config = {port, _Port},
-	{_, Port} = Config, 
+    {ok, Port} = application:get_env(owm_resolver, port),
+	Config = {port, Port},
 	Dispatch = dispatch_rules(),
-	{ok, _} = cowboy:start_http(http, 100, [Config], [
+	_CowboyStart = cowboy:start_http(http, 100, [Config], [
 		{env, [{dispatch, Dispatch}]}
 	]),
 	lager:log(info, self(), "owm resolver started on ~p:~p", [node(), Port]),

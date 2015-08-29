@@ -42,7 +42,9 @@ build_testing: clean compile
 	chmod +x $(RELEASE_EXECUTABLE)
 
 
-testing_console: build_testing
+testing_console: compile
+	rebar generate overlay_vars=$(OVERLAY_VARS_DEBUG)
+	chmod +x $(RELEASE_EXECUTABLE)
 	./$(RELEASE_EXECUTABLE) console
 
 deb: clean build

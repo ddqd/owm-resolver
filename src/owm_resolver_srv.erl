@@ -4,7 +4,7 @@
  
 -include("owm_resolver.hrl").
 
--export([start_link/1, start_link/2, start_link/3, stop/0]).
+-export([start_link/1, start_link/2, stop/0]).
  
 -export([init/1]).
  
@@ -12,7 +12,7 @@
 
 -export([load/1, parse_city_list/1]).
 
--record(state, {host=[]}).
+-record(state, {host=[], start_type }).
 
 load(Host) ->
 	R = httpc:request(get, {Host, []}, [], []),
@@ -61,12 +61,11 @@ parse_city(Other) ->
     lager:log(info, self(), "error parse city ~p", [Other]),
     error.
 
-init(Args_) ->
-    {args, Args} = Args_,
+init(Args) ->
 	lager:log(info, self(), "resolver started with mode ~p", [Args]),
     Host =  proplists:get_value(host, Args),
     Type = proplists:get_value(start_type, Args),
-    lager:log(info, self(), "start update ~p", [Type]),
+    lager:log(info, self(), "start in mode: ~p", [Type]),
     check_load(),
     {ok, #state{host=Host}}.
 
@@ -105,15 +104,12 @@ handle_cast(_Msg, State) ->
 handle_info(_Info, State) ->
     lager:log(info, self(), "handle_info ~p", [State]),
     {noreply, State}.
- 
+
 start_link(Args) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Args, []).
 
-start_link(Args, _) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, Args, []).
-
-start_link(Args, State, _) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, Args, State).
+start_link(Host, StartType) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [Host, StartType], []).
 
 stop() ->
     gen_server:call(?MODULE, stop).
